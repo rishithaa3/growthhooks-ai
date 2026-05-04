@@ -1,4 +1,5 @@
-const API_BASE_URL = 'http://localhost:5001/api';
+// const API_BASE_URL = 'http://localhost:5001/api';
+const API_BASE_URL = 'https://growthhooks-backend.onrender.com/api';
 
 export const generateHooks = async (data) => {
   const response = await fetch(`${API_BASE_URL}/generate-hooks`, {
