@@ -6,7 +6,7 @@ A full-stack AI web application to generate viral LinkedIn hooks using external 
 
 *   **Frontend:** React + Vite + Tailwind CSS
 *   **Backend:** Node.js + Express
-*   **AI:** `@google/genai` (Gemini 2.5 Flash)
+*   **AI:** `llama-3.3-70b-versatile` (Groq)
 *   **Email:** Nodemailer (Gmail SMTP)
 
 ## Setup Instructions
@@ -21,10 +21,17 @@ A full-stack AI web application to generate viral LinkedIn hooks using external 
    ```bash
    npm install
    ```
-3. Open `server/.env` and configure your API keys:
-   *   `GEMINI_API_KEY`: Your Google AI Studio API key.
-   *   `EMAIL_USER`: Your Gmail address.
-   *   `EMAIL_PASS`: Your Gmail **App Password** (not your regular password).
+3. Open `server/.env` and configure your variables:
+   
+   EMAIL_USER=
+   EMAIL_PASS=
+   SUPABASE_URL=
+   SUPABASE_ANON_KEY=
+   GROQ_API_KEY=
+   APIFY_API_TOKEN=
+   APIFY_ACTOR_ID=
+
+USE_FIXTURES=true
 4. Start the backend server:
    ```bash
    npm run dev
@@ -48,9 +55,7 @@ A full-stack AI web application to generate viral LinkedIn hooks using external 
 ## Usage
 
 1. Open the frontend in your browser (usually `http://localhost:5173`).
-2. The UI is split into two modes:
-    *   **Pixii Engine (Main):** Uses hardcoded Pixii context. You can optionally provide a topic focus.
-    *   **Business Hooks:** General hook generation based on a specific niche.
-3. Configure the goal and tone.
+2. **Pixii Engine (Main):** Uses hardcoded Pixii context. You can optionally provide an instruction.
+3. Configure the goal, time range and tone.
 4. Click **Generate Hooks**. The backend will scrape Google for recent trends and use Gemini to generate highly tailored hooks.
 5. (Optional) Enter an email address at the bottom to send the results to your inbox.
