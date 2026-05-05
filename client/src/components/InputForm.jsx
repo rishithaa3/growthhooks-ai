@@ -7,10 +7,11 @@ const InputForm = ({ onGenerate, loading }) => {
   const [topic, setTopic] = useState('');
   const [goal, setGoal] = useState('Get leads');
   const [tone, setTone] = useState('Contrarian');
+  const [timeRange, setTimeRange] = useState('1w');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onGenerate({ mode, niche, topic, goal, tone });
+    onGenerate({ mode, niche, topic, goal, tone, timeRange });
   };
 
   return (
@@ -90,6 +91,14 @@ const InputForm = ({ onGenerate, loading }) => {
             <option value="Insight-driven">Insight-driven</option>
             <option value="Sharp & Bold">Sharp & Bold</option>
             <option value="Educational">Educational</option>
+          </select>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-gray-300">⏱ Time Range</label>
+          <select value={timeRange} onChange={(e) => setTimeRange(e.target.value)} className="input-field appearance-none">
+            <option value="24h">Past 24 Hours</option>
+            <option value="1w">Past 1 Week</option>
           </select>
         </div>
 

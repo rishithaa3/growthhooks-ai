@@ -4,7 +4,10 @@ import dotenv from 'dotenv';
 import hooksRouter from './routes/hooks.js';
 import emailRouter from './routes/email.js';
 
+import { startScheduler } from './services/scheduler.js';
+
 dotenv.config();
+startScheduler();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
