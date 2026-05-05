@@ -114,7 +114,7 @@ const OutputView = ({ result, loading }) => {
 
       {stats && (
         <div className="text-sm text-gray-400 mb-4">
-          Analyzed {stats.totalAnalyzed} posts → Selected {stats.selected} high-signal posts
+          Analyzed {stats.totalAnalyzed} posts 
         </div>
       )}
 
