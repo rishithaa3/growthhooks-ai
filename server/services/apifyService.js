@@ -118,6 +118,10 @@ export async function fetchLinkedInPosts(queries, timeRange = '1w') {
 
       console.log(`[Apify] RAW items count: ${items.length}`);
 
+      // 🔥 FULL RAW DUMP
+      console.log('[DEBUG][RAW_FULL]');
+      console.log(JSON.stringify(items, null, 2));
+
       if (items.length > 0) {
         console.log('[Apify] RAW sample keys:', Object.keys(items[0]));
         console.log('[Apify] RAW sample stats:', items[0].stats);
@@ -133,10 +137,17 @@ export async function fetchLinkedInPosts(queries, timeRange = '1w') {
 
       console.log('[Normalize] Sample normalized post:', normalized[0]);
 
+      // 🔥 FULL NORMALIZED DATA
+      console.log('[DEBUG][NORMALIZED_FULL]');
+      console.log(JSON.stringify(normalized, null, 2));
+
       let rejectedCount = 0;
 
+      // 🔥 STORE ALL REJECTIONS
+      const rejectedPostsFull = [];
+
       // Filter
-      const filtered = normalized.filter((p, index) => {
+      const filtered = normalized.filter((p) => {
         const text = (p.text || '').toLowerCase();
 
         let reason = null;
@@ -163,7 +174,7 @@ export async function fetchLinkedInPosts(queries, timeRange = '1w') {
         if (reason) {
           rejectedCount++;
 
-          // Log only first few rejections to avoid spam
+          // existing limited logs (unchanged)
           if (rejectedCount <= 5) {
             console.log(`[FILTER REJECTED] Reason: ${reason}`);
             console.log({
@@ -172,6 +183,17 @@ export async function fetchLinkedInPosts(queries, timeRange = '1w') {
               comments: p.comments
             });
           }
+
+          // 🔥 ADD FULL REJECTION TRACKING
+          rejectedPostsFull.push({
+            reason,
+            text: p.text,
+            likes: p.likes,
+            comments: p.comments,
+            shares: p.shares,
+            timestamp: p.timestamp,
+            postUrl: p.postUrl
+          });
 
           return false;
         }
@@ -184,6 +206,14 @@ export async function fetchLinkedInPosts(queries, timeRange = '1w') {
       if (filtered.length > 0) {
         console.log('[Filter] Sample accepted post:', filtered[0]);
       }
+
+      // 🔥 FULL REJECTED DATA
+      console.log('[DEBUG][REJECTED_FULL]');
+      console.log(JSON.stringify(rejectedPostsFull, null, 2));
+
+      // 🔥 FULL FILTERED DATA
+      console.log('[DEBUG][FILTERED_FULL]');
+      console.log(JSON.stringify(filtered, null, 2));
 
       allPosts.push(...filtered);
 
@@ -208,6 +238,16 @@ export async function fetchLinkedInPosts(queries, timeRange = '1w') {
   }
 
   console.log('[Final Output] Total posts returned:', unique.length);
+
+  // 🔥 FULL FINAL OUTPUT
+  console.log('[DEBUG][FINAL_UNIQUE_FULL]');
+  console.log(JSON.stringify(unique, null, 2));
+
+  // 🔥 COPY-READY BLOCK
+  console.log('\n===== COPY THIS FOR linkedinPosts.json =====');
+  console.log(JSON.stringify(unique, null, 2));
+  console.log('===== END COPY =====\n');
+
   console.log('================ APIFY DEBUG END ================\n');
 
   return unique;
