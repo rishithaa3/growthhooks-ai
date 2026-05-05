@@ -47,7 +47,8 @@ const OutputView = ({ result, loading }) => {
 
   const handleEmail = async (e) => {
     e.preventDefault();
-    if (!email) return;
+    // if (!email) return;
+    if (!email || emailStatus === 'sending') return;
 
     setEmailStatus('sending');
     try {
@@ -187,8 +188,15 @@ const OutputView = ({ result, loading }) => {
           placeholder="email"
           className="input-field"
         />
-        <button type="submit">
-          {emailStatus === 'sending' ? 'Sending...' : 'Send'}
+        <button
+          type="submit"
+          disabled={emailStatus === 'sending'}
+          className="btn-primary px-4"
+        >
+          {emailStatus === 'sending' && 'Sending...'}
+          {emailStatus === 'success' && 'Sent!'}
+          {emailStatus === 'error' && 'Failed'}
+          {emailStatus === 'idle' && 'Send'}
         </button>
       </form>
 

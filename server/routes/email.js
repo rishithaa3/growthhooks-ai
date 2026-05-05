@@ -6,20 +6,37 @@ const router = express.Router();
 router.post('/send-email', async (req, res) => {
   const { email, hooks, insights } = req.body;
 
+  console.log("\n===== EMAIL REQUEST START =====");
+
+  console.log("[DEBUG] Incoming request:");
+  console.log("Email:", email);
+  console.log("Hooks count:", hooks?.length);
+  console.log("Insights count:", insights?.length);
+
+  console.log("[DEBUG] ENV CHECK:");
+  console.log("EMAIL_USER:", process.env.EMAIL_USER);
+  console.log("EMAIL_PASS exists:", !!process.env.EMAIL_PASS);
+
   if (!email || !hooks) {
     return res.status(400).json({ error: "Email and hooks are required." });
   }
 
   try {
     const transporter = nodemailer.createTransport({
-      service: 'gmail',
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false,
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
       }
     });
 
-    // Build HTML email content
+    console.log("[DEBUG] Verifying SMTP connection...");
+    await transporter.verify();
+    console.log("✅ SMTP connection successful");
+
+    // ✅ Build HTML properly
     let htmlContent = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
         <h2 style="color: #2563eb;">Your AI Generated Hooks</h2>
@@ -27,9 +44,16 @@ router.post('/send-email', async (req, res) => {
     `;
 
     hooks.forEach((hook, i) => {
+      const hookText =
+        typeof hook === 'string'
+          ? hook
+          : hook.hook || hook.text || '';
+
       htmlContent += `
         <div style="margin-bottom: 20px; padding: 15px; background: #f3f4f6; border-left: 4px solid #3b82f6; border-radius: 4px;">
-          <p style="font-size: 16px; font-weight: bold; margin: 0 0 10px 0;">${hook}</p>
+          <p style="font-size: 16px; font-weight: bold; margin: 0;">
+            ${i + 1}. ${hookText}
+          </p>
         </div>
       `;
     });
@@ -59,12 +83,25 @@ router.post('/send-email', async (req, res) => {
       html: htmlContent
     };
 
-    await transporter.sendMail(mailOptions);
+    console.log("[DEBUG] Sending email to:", email);
+
+    const info = await transporter.sendMail(mailOptions);
+
+    console.log("✅ Email sent successfully!");
+    console.log("[DEBUG] Message ID:", info.messageId);
+
+    console.log("===== EMAIL REQUEST END =====\n");
+
     res.json({ message: "Email sent successfully" });
 
   } catch (error) {
-    console.error("Email error:", error);
-    res.status(500).json({ error: "Failed to send email. Check configuration." });
+    console.error("\n❌ EMAIL ERROR");
+    console.error(error.message);
+
+    res.status(500).json({
+      error: "Failed to send email",
+      details: error.message
+    });
   }
 });
 
