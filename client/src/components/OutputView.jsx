@@ -112,11 +112,11 @@ const OutputView = ({ result, loading }) => {
   return (
     <div className="space-y-8">
 
-      {stats && (
+      {/* {stats && (
         <div className="text-sm text-gray-400 mb-4">
           Analyzed {stats.totalAnalyzed} posts 
         </div>
-      )}
+      )} */}
 
       {/* Hooks */}
       <section>
