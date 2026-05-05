@@ -35,7 +35,16 @@ export function computeVirality(posts) {
 
   return posts
     .map(post => {
-      const postDate = new Date(post.timestamp);
+      // const postDate = new Date(post.timestamp);
+      let postDate;
+
+      if (typeof post.timestamp === 'object') {
+        postDate = new Date(post.timestamp.date || post.timestamp.timestamp);
+      } else {
+        postDate = new Date(post.timestamp);
+      }
+
+      if (isNaN(postDate)) return null;
       if (isNaN(postDate)) return null;
 
       const hoursSincePost = Math.max(
@@ -76,7 +85,16 @@ export function filterByTime(posts, timeRange) {
   const now = new Date();
 
   return posts.filter(post => {
-    const postDate = new Date(post.timestamp);
+    // const postDate = new Date(post.timestamp);
+    let postDate;
+
+    if (typeof post.timestamp === 'object') {
+      postDate = new Date(post.timestamp.date || post.timestamp.timestamp);
+    } else {
+      postDate = new Date(post.timestamp);
+    }
+
+    if (isNaN(postDate)) return null;
     const hoursSincePost =
       (now - postDate) / (1000 * 60 * 60);
 
