@@ -1,20 +1,29 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Send, CheckCircle2, Copy, TrendingUp, Lightbulb } from 'lucide-react';
 import { sendEmail } from '../api';
+import { improveHook } from '../api';
 
 const OutputView = ({ result, loading }) => {
   const [email, setEmail] = useState('');
-  const [emailStatus, setEmailStatus] = useState('idle'); // idle, sending, success, error
+  const [emailStatus, setEmailStatus] = useState('idle');
   const [copiedIndex, setCopiedIndex] = useState(null);
+
+  const [showImproveModal, setShowImproveModal] = useState(false);
+  const [selectedHookIndex, setSelectedHookIndex] = useState(null);
+  const [improveText, setImproveText] = useState('');
+
+  const [improvingIndex, setImprovingIndex] = useState(null);
+  const [improvedHooks, setImprovedHooks] = useState({});
 
   if (loading) {
     return (
       <div className="glass-card h-96 flex flex-col items-center justify-center space-y-4">
         <div className="relative">
           <div className="w-16 h-16 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
-          <div className="absolute inset-0 border-4 border-secondary/30 border-b-secondary rounded-full animate-spin animation-delay-500"></div>
         </div>
-        <p className="text-gray-400 font-medium animate-pulse">Analyzing trends & crafting hooks...</p>
+        <p className="text-gray-400 font-medium animate-pulse">
+          Analyzing trends & crafting hooks...
+        </p>
       </div>
     );
   }
@@ -28,7 +37,7 @@ const OutputView = ({ result, loading }) => {
     );
   }
 
-  const { hooks, explanations, trends } = result;
+  const { hooks, explanations, trends, stats } = result;
 
   const handleCopy = (text, index) => {
     navigator.clipboard.writeText(text);
@@ -39,7 +48,7 @@ const OutputView = ({ result, loading }) => {
   const handleEmail = async (e) => {
     e.preventDefault();
     if (!email) return;
-    
+
     setEmailStatus('sending');
     try {
       await sendEmail(email, hooks, trends);
@@ -51,92 +60,164 @@ const OutputView = ({ result, loading }) => {
     }
   };
 
+  const openImproveModal = (index) => {
+    setSelectedHookIndex(index);
+    setImproveText('');
+    setShowImproveModal(true);
+  };
+
+  const handleImprove = async () => {
+    if (selectedHookIndex === null) return;
+
+    const hookObj = hooks[selectedHookIndex];
+
+    const originalHook =
+      typeof hookObj === 'string' ? hookObj : hookObj.hook;
+
+    const id =
+      typeof hookObj === 'string' ? null : hookObj.id;
+
+    try {
+      setImprovingIndex(selectedHookIndex);
+
+      console.log('[Improve Debug]', {
+        hookObj,
+        originalHook,
+        id,
+        instruction: improveText
+      });
+
+
+      const res = await improveHook(
+        originalHook,
+        improveText,
+        "Contrarian",
+        id
+      );
+
+      setImprovedHooks(prev => ({
+        ...prev,
+        [selectedHookIndex]: res.improvedHook
+      }));
+
+      setShowImproveModal(false);
+
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setImprovingIndex(null);
+    }
+  };
+
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      
-      {/* Hooks Section */}
+    <div className="space-y-8">
+
+      {stats && (
+        <div className="text-sm text-gray-400 mb-4">
+          Analyzed {stats.totalAnalyzed} posts → Selected {stats.selected} high-signal posts
+        </div>
+      )}
+
+      {/* Hooks */}
       <section>
         <h3 className="text-2xl font-bold mb-4 flex items-center">
-          <span className="bg-primary/20 text-primary p-2 rounded-lg mr-3">
-            <CheckCircle2 className="w-6 h-6" />
-          </span>
+          <CheckCircle2 className="w-6 h-6 mr-2 text-primary" />
           Generated Hooks
         </h3>
-        <div className="space-y-4">
-          {hooks?.map((hook, index) => (
-            <div key={index} className="glass-card relative group hover:border-primary/50 transition-colors">
-              <p className="text-lg font-medium pr-12 leading-relaxed">{hook}</p>
-              
-              <button 
-                onClick={() => handleCopy(hook, index)}
-                className="absolute top-4 right-4 p-2 rounded-md bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
-                title="Copy to clipboard"
-              >
-                {copiedIndex === index ? <CheckCircle2 className="w-5 h-5 text-green-400" /> : <Copy className="w-5 h-5" />}
-              </button>
 
-              {explanations && explanations[index] && (
-                <div className="mt-4 pt-4 border-t border-white/10">
-                  <p className="text-sm text-gray-400 flex items-start">
-                    <Lightbulb className="w-4 h-4 mr-2 mt-0.5 text-yellow-500 flex-shrink-0" />
-                    <span className="italic">{explanations[index]}</span>
-                  </p>
-                </div>
-              )}
-            </div>
-          ))}
+        <div className="space-y-4">
+          {hooks?.map((hookItem, index) => {
+            const hookText =
+              improvedHooks[index] ||
+              (typeof hookItem === 'string' ? hookItem : hookItem.hook);
+
+            return (
+              <div key={index} className="glass-card relative">
+
+                <p className="text-lg font-medium pr-12">
+                  {hookText}
+                </p>
+
+                <button
+                  onClick={() => handleCopy(hookText, index)}
+                  className="absolute top-4 right-4"
+                >
+                  {copiedIndex === index ? '✓' : 'Copy'}
+                </button>
+
+                <button
+                  onClick={() => openImproveModal(index)}
+                  className="text-xs text-primary mt-2"
+                >
+                  Improve this hook
+                </button>
+
+                {explanations && explanations[index] && (
+                  <div className="mt-4 border-t pt-2 text-sm text-gray-400">
+                    {explanations[index]}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </section>
 
-      {/* Trends Section */}
-      {trends && trends.length > 0 && (
+      {/* Trends */}
+      {trends && (
         <section>
-          <h3 className="text-2xl font-bold mb-4 flex items-center">
-             <span className="bg-secondary/20 text-secondary p-2 rounded-lg mr-3">
-              <TrendingUp className="w-6 h-6" />
-            </span>
-            Trend Insights
+          <h3 className="text-xl font-bold mb-2 flex items-center">
+            <TrendingUp className="w-5 h-5 mr-2 text-secondary" />
+            Trends
           </h3>
-          <div className="glass-card">
-            <ul className="space-y-3">
-              {trends.map((trend, i) => (
-                <li key={i} className="flex items-start text-gray-300">
-                  <span className="text-secondary mr-3 mt-1">•</span>
-                  <span>{trend}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <ul className="space-y-2">
+            {trends.map((t, i) => (
+              <li key={i}>• {t}</li>
+            ))}
+          </ul>
         </section>
       )}
 
-      {/* Email Export */}
-      <section className="glass-card bg-gradient-to-br from-surface to-surface/50 border-primary/20">
-        <h3 className="text-lg font-bold mb-2">Export to Email</h3>
-        <p className="text-sm text-gray-400 mb-4">Send these hooks and insights directly to your inbox or team.</p>
-        
-        <form onSubmit={handleEmail} className="flex space-x-3">
-          <input 
-            type="email" 
-            required 
-            placeholder="team@pixii.com" 
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="input-field flex-grow"
-          />
-          <button 
-            type="submit" 
-            disabled={emailStatus === 'sending' || emailStatus === 'success'}
-            className="bg-primary hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-medium flex items-center transition-colors disabled:opacity-50"
-          >
-            {emailStatus === 'sending' ? 'Sending...' : 
-             emailStatus === 'success' ? 'Sent!' : 
-             <><Send className="w-4 h-4 mr-2" /> Send</>}
-          </button>
-        </form>
-        {emailStatus === 'error' && <p className="text-red-400 text-sm mt-2">Failed to send email. Check server configuration.</p>}
-      </section>
+      {/* Email */}
+      <form onSubmit={handleEmail} className="flex gap-2">
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="email"
+          className="input-field"
+        />
+        <button type="submit">
+          {emailStatus === 'sending' ? 'Sending...' : 'Send'}
+        </button>
+      </form>
 
+      {/* 🔥 Improve Modal */}
+      {showImproveModal && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center">
+          <div className="bg-surface p-6 rounded-lg w-[400px]">
+            <h3 className="mb-2 font-semibold">Improve Hook</h3>
+
+            <textarea
+              value={improveText}
+              onChange={(e) => setImproveText(e.target.value)}
+              placeholder="make it shorter / more aggressive / more contrarian"
+              className="input-field w-full mb-4"
+              rows={3}
+            />
+
+            <div className="flex justify-end gap-2">
+              <button onClick={() => setShowImproveModal(false)}>
+                Cancel
+              </button>
+
+              <button onClick={handleImprove} className="btn-primary">
+                Improve
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

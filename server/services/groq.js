@@ -16,22 +16,27 @@ Core beliefs:
 Tone: Contrarian, Insight-driven, Sharp, bold, no fluff.
 `;
 
-export async function generateHooksWithGroq({ mode, niche, topic, goal, tone, topPosts, patterns }) {
-  const isPixii = mode === 'Pixii';
+const goalMap = {
+  "Get leads": "Focus on lead generation and conversions",
+  "Increase engagement": "Focus on curiosity and engagement",
+  "Build authority": "Focus on insights and expertise",
+  "Drive conversions": "Focus on sales and decision triggers"
+};
+
+// 🔥 EDITED: removed mode, niche, topic → using instructions only
+export async function generateHooksWithGroq({ instructions, goal, tone, topPosts, patterns }) {
 
   let promptStr = `You are an expert LinkedIn copywriter. I need you to generate viral LinkedIn hooks.\n\n`;
 
-  if (isPixii) {
-    promptStr += `Mode: Pixii Growth Engine\n`;
-    promptStr += `Brand Context:\n${pixiiContext}\n`;
-    promptStr += `STRICT PIXII REQUIREMENT: You MUST target ecommerce founders and emphasize revenue, Amazon listings, conversion rates, and product images.\n`;
-    if (topic) promptStr += `Topic Focus: ${topic}\n`;
-  } else {
-    promptStr += `Mode: Business Hooks\n`;
-    if (niche) promptStr += `Niche: ${niche}\n`;
+  promptStr += `Brand Context:\n${pixiiContext}\n`;
+  promptStr += `STRICT PIXII REQUIREMENT: You MUST target ecommerce founders and emphasize revenue, Amazon listings, conversion rates, and product images.\n`;
+
+  // 🔥 EDITED: instructions added as primary control
+  if (instructions) {
+    promptStr += `User Instructions: ${instructions}\n`;
   }
 
-  promptStr += `\nGoal: ${goal || 'Get leads'}\n`;
+  promptStr += `Goal: ${goalMap[goal] || goal}\n`;
   promptStr += `Tone: ${tone || 'Contrarian'}\n`;
 
   if (patterns && patterns.length > 0) {
@@ -48,17 +53,17 @@ export async function generateHooksWithGroq({ mode, niche, topic, goal, tone, to
   
 Task:
 Based on the context, goal, tone, extracted patterns, and top posts above, please generate:
-1. 5 viral LinkedIn hooks. Focus on contrarian hooks, pain-point hooks, and curiosity hooks. Emulate the extracted patterns.
+1. 4 viral LinkedIn hooks.
 2. For each hook, provide a brief explanation of why it works.
-3. List the structural patterns you observed and utilized.
-4. Provide 2-3 trend insights derived from the provided top posts.
+3. List the structural patterns used.
+4. Provide 2-3 trend insights.
 
-Return ONLY a valid JSON object matching this schema exactly (do not wrap in markdown or anything else):
+Return ONLY JSON:
 {
-  "hooks": ["Hook text 1", "Hook text 2"],
-  "explanations": ["Explanation for hook 1", "Explanation for hook 2"],
-  "patterns": ["Pattern 1", "Pattern 2"],
-  "trend_insights": ["Trend insight 1", "Trend insight 2"]
+  "hooks": [],
+  "explanations": [],
+  "patterns": [],
+  "trend_insights": []
 }
 `;
 

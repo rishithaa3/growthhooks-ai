@@ -73,3 +73,4 @@ By feeding it **only** the first two sentences (the true "hook" of the original 
 Now that the server prints all extracted hooks to the console (`=== EXTRACTED HOOKS FED TO AI ===`), you can run a generation in the UI, read the generated hooks, and compare them side-by-side with the console output. 
 
 You will notice that the AI rarely copies a snippet verbatim. Instead, it absorbs the *vibe* and *structure* of the snippets, and reskins them for your specific niche.
+const SERPER_URL = 'https://google.serper.dev/search';

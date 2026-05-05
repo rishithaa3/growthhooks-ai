@@ -28,3 +28,18 @@ export const sendEmail = async (email, hooks, insights) => {
 
   return response.json();
 };
+
+
+export const improveHook = async (hook, instruction, tone, id) => {
+  const response = await fetch(`${API_BASE_URL}/improve-hook`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ hook, instruction, tone, id })
+  });
+
+  if (!response.ok) throw new Error('Failed to improve hook');
+
+  return response.json();
+};

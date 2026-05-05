@@ -3,63 +3,92 @@ import nodemailer from 'nodemailer';
 import { fetchLinkedInPosts } from './apifyService.js';
 import { processViralPosts } from './viralEngine.js';
 import { generateHooksWithGroq } from './groq.js';
+import { saveHooks } from './dbService.js';
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 
-/**
- * Searches to run via Apify
- */
-const SCHEDULED_QUERIES = [
-  "ecommerce growth",
-  "AI marketing",
-  "Amazon listings",
-  "D2C growth",
-  "conversion optimization",
-  "product images / PDP"
-];
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const USE_FIXTURES = process.env.USE_FIXTURES === 'true';
+
+const fixturePosts = JSON.parse(
+  readFileSync(join(__dirname, '../fixtures/linkedinPosts.json'), 'utf-8')
+);
+
+function getPatternExamples(patterns) {
+  return patterns.examples ? [
+    ...patterns.examples.contrarian,
+    ...patterns.examples.painPoint,
+    ...patterns.examples.curiosity,
+    ...patterns.examples.numberLed
+  ] : [];
+}
+
+function buildQueries() {
+  return [
+    '"product page" ecommerce OR "amazon listing" optimization OR "bad product page" OR "why ads don’t convert"'
+  ];
+}
+
+async function getPosts(timeRange) {
+  if (USE_FIXTURES) {
+    console.log('[Scheduler] Using fixture data');
+    return fixturePosts;
+  }
+
+  console.log('[Scheduler] Using Apify');
+  const queries = buildQueries();
+  return await fetchLinkedInPosts(queries, timeRange);
+}
 
 async function runWeeklyReport() {
   console.log('[Scheduler] Running Weekly Viral Hooks Report...');
 
   try {
-    // 1. Fetch real data from Apify (last 1 week, sorted by relevance)
-    const rawPosts = await fetchLinkedInPosts(SCHEDULED_QUERIES, '1w');
-
-    // 2. Process with Virality Engine (1w timeRange)
-    const { topPosts, patterns } = processViralPosts(rawPosts, '1w');
-
-    // Default settings for Pixii report
     const mode = 'Pixii';
     const goal = 'Get leads';
     const tone = 'Contrarian';
 
-    // 3. Generate Hooks
-    console.log('[Scheduler] Generating hooks with Groq...');
+    // 🔥 SAME PIPELINE AS MAIN ROUTE
+    const rawPosts = await getPosts('1w');
+
+    const { topPosts, patterns } = processViralPosts(rawPosts, '1w');
+
     const result = await generateHooksWithGroq({
       mode,
       goal,
       tone,
       topPosts: topPosts.map(p => p.text),
-      patterns: patterns.examples ? [
-        ...patterns.examples.contrarian,
-        ...patterns.examples.painPoint,
-        ...patterns.examples.curiosity,
-        ...patterns.examples.numberLed
-      ] : []
+      patterns: getPatternExamples(patterns)
     });
 
-    // 4. Send Email
+    // 🔥 SAVE TO DB
+    await saveHooks({
+      hooks: result.hooks,
+      explanations: result.explanations,
+      trends: result.trends,
+      source: USE_FIXTURES ? 'fixture' : 'apify',
+      mode,
+      topic: null,
+      goal,
+      tone
+    });
+
+    // 🔥 EMAIL
     await sendWeeklyEmail(result);
-    console.log('[Scheduler] Weekly report sent successfully.');
+
+    console.log('[Scheduler] Weekly report completed successfully.');
 
   } catch (error) {
-    console.error('[Scheduler] Failed to run weekly report:', error);
+    console.error('[Scheduler] Failed:', error);
   }
 }
 
-async function sendWeeklyEmail({ hooks, explanations, patterns, trend_insights }) {
-  const emailTo = process.env.EMAIL_USER; // Send to admin
+async function sendWeeklyEmail({ hooks, explanations, trends }) {
+  const emailTo = process.env.EMAIL_USER;
 
   if (!emailTo) {
-    console.warn('[Scheduler] EMAIL_USER not set. Cannot send report.');
+    console.warn('[Scheduler] EMAIL_USER not set.');
     return;
   }
 
@@ -71,63 +100,34 @@ async function sendWeeklyEmail({ hooks, explanations, patterns, trend_insights }
     }
   });
 
-  let htmlContent = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
-      <h2 style="color: #2563eb;">Weekly Viral Hooks Report – Pixii</h2>
-      <p>Here is your data-backed hook report based on last week's top performing posts.</p>
-  `;
+  let htmlContent = `<h2>Weekly Viral Hooks Report – Pixii</h2>`;
 
-  htmlContent += `<h3>1. Top Hooks (PRIMARY)</h3>`;
   (hooks || []).forEach((hook, i) => {
     htmlContent += `
-      <div style="margin-bottom: 20px; padding: 15px; background: #f3f4f6; border-left: 4px solid #3b82f6; border-radius: 4px;">
-        <p style="font-size: 16px; font-weight: bold; margin: 0 0 10px 0;">${hook}</p>
-        <p style="font-size: 14px; margin: 0; color: #555;"><em>Why it works:</em> ${explanations ? explanations[i] : ''}</p>
-      </div>
+      <p><strong>${hook}</strong><br/>
+      <em>${explanations?.[i] || ''}</em></p>
     `;
   });
 
-  if (patterns && patterns.length > 0) {
-    htmlContent += `<h3>2. Emerging Patterns</h3><ul>`;
-    patterns.forEach(pattern => {
-      htmlContent += `<li style="margin-bottom: 10px;">${pattern}</li>`;
-    });
+  if (trends?.length) {
+    htmlContent += `<h3>Trends</h3><ul>`;
+    trends.forEach(t => htmlContent += `<li>${t}</li>`);
     htmlContent += `</ul>`;
   }
 
-  if (trend_insights && trend_insights.length > 0) {
-    htmlContent += `<h3>3. Trend Insights</h3><ul>`;
-    trend_insights.forEach(insight => {
-      htmlContent += `<li style="margin-bottom: 10px;">${insight}</li>`;
-    });
-    htmlContent += `</ul>`;
-  }
-
-  htmlContent += `
-      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb; font-size: 12px; color: #6b7280;">
-        <p>Generated by GrowthHooks Virality Intelligence Engine</p>
-      </div>
-    </div>
-  `;
-
-  const mailOptions = {
+  await transporter.sendMail({
     from: process.env.EMAIL_USER,
     to: emailTo,
     subject: 'Weekly Viral Hooks Report – Pixii',
     html: htmlContent
-  };
-
-  await transporter.sendMail(mailOptions);
+  });
 }
 
 export function startScheduler() {
-  // Run every Monday at 7:00 AM IST
-  cron.schedule('0 7 * * 1', () => {
-    runWeeklyReport();
-  }, {
+  cron.schedule('0 7 * * 1', runWeeklyReport, {
     scheduled: true,
     timezone: "Asia/Kolkata"
   });
-  
-  console.log('[Scheduler] Weekly cron job initialized for Monday 7:00 AM IST');
+
+  console.log('[Scheduler] Weekly cron job initialized');
 }

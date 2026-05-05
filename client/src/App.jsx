@@ -36,7 +36,7 @@ function App() {
             </div>
             <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">GrowthHooks <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">AI</span></h1>
           </div>
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto">Generate viral, contrarian LinkedIn hooks powered by real-time trend data and tailored brand context.</p>
+          <p className="text-gray-400 text-lg max-w-2xl mx-auto">Generate viral hooks powered by real-time trend data for Pixii.</p>
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">

@@ -1,37 +1,121 @@
 [
   {
-    "text": "Your Amazon main image is your ad.\nNot your infographic. Not your A+ content.\nYour main image is the only thing a shopper sees before deciding to click or scroll.\nWe tested 3 variants for a supplement brand. The winner had zero text, white background, product front-facing.\nCTR went from 4.2% to 7.8%. Same price. Same PPC spend.\nStop designing. Start testing.",
-    "stats": { "likes": 847, "comments": 134 },
-    "post_url": "https://www.linkedin.com/posts/example-1",
-    "author": { "name": "Jason Hom", "headline": "Amazon Brand Strategist" },
-    "posted_at": "2026-04-28T10:00:00.000Z"
+    "text": "Most ecommerce brands are burning money on ads because their product page doesn’t convert.",
+    "likes": 3200,
+    "comments": 180,
+    "shares": 42,
+    "postUrl": "https://linkedin.com/posts/1",
+    "timestamp": "2026-05-01T10:00:00Z"
   },
   {
-    "text": "I analyzed 200 Amazon listings that went from under $10k/month to over $100k/month.\nOne thing they all changed first: the main image.\nNot the title. Not the bullets. Not the price.\nThe image.",
-    "stats": { "likes": 1243, "comments": 89 },
-    "post_url": "https://www.linkedin.com/posts/example-2",
-    "author": { "name": "Sarah Chen", "headline": "D2C Growth Advisor" },
-    "posted_at": "2026-04-29T08:30:00.000Z"
+    "text": "Stop scaling ads. Fix your product page first. That’s where the real money is.",
+    "likes": 2800,
+    "comments": 140,
+    "shares": 30,
+    "postUrl": "https://linkedin.com/posts/2",
+    "timestamp": "2026-05-02T12:00:00Z"
   },
   {
-    "text": "An agency quoted my client $18,000 for a full Amazon listing redesign.\n7 images, lifestyle shots, A+ content.\n6 week timeline.\nWe did it with AI in 40 minutes.\nThe client couldn't tell which was which in a blind test.",
-    "stats": { "likes": 2891, "comments": 312 },
-    "post_url": "https://www.linkedin.com/posts/example-3",
-    "author": { "name": "Mike Torres", "headline": "Amazon FBA Consultant" },
-    "posted_at": "2026-04-30T09:15:00.000Z"
+    "text": "Unpopular opinion: Most D2C brands don’t have a traffic problem. They have a conversion problem.",
+    "likes": 4100,
+    "comments": 260,
+    "shares": 75,
+    "postUrl": "https://linkedin.com/posts/3",
+    "timestamp": "2026-05-02T14:00:00Z"
   },
   {
-    "text": "Unpopular opinion: most Amazon sellers are optimizing the wrong thing.\nYou're split-testing bullet points while your main image has a 2% CTR.\nFix the image first. Always.",
-    "stats": { "likes": 567, "comments": 201 },
-    "post_url": "https://www.linkedin.com/posts/example-4",
-    "author": { "name": "Priya Nair", "headline": "eCommerce Creative Strategist" },
-    "posted_at": "2026-05-01T11:00:00.000Z"
+    "text": "Your product images are costing you sales. Not your ads.",
+    "likes": 2500,
+    "comments": 120,
+    "shares": 20,
+    "postUrl": "https://linkedin.com/posts/4",
+    "timestamp": "2026-05-03T09:00:00Z"
   },
   {
-    "text": "The brands winning on Amazon in 2025 have one thing in common.\nThey treat their listing like a landing page, not a product catalogue.\nEvery image has a job. Main image: stop the scroll. Image 2: explain the problem. Image 3: prove the solution. Image 4: handle objections. Image 5: social proof.",
-    "stats": { "likes": 934, "comments": 156 },
-    "post_url": "https://www.linkedin.com/posts/example-5",
-    "author": { "name": "David Park", "headline": "Amazon Agency Owner" },
-    "posted_at": "2026-05-02T07:45:00.000Z"
+    "text": "The biggest mistake ecommerce founders make? Optimizing traffic instead of conversions.",
+    "likes": 3600,
+    "comments": 200,
+    "shares": 60,
+    "postUrl": "https://linkedin.com/posts/5",
+    "timestamp": "2026-05-03T11:00:00Z"
+  },
+  {
+    "text": "Your landing page is leaking revenue every single day.",
+    "likes": 2900,
+    "comments": 160,
+    "shares": 35,
+    "postUrl": "https://linkedin.com/posts/6",
+    "timestamp": "2026-05-04T09:00:00Z"
+  },
+  {
+    "text": "Most brands guess what works. The top 1% test everything.",
+    "likes": 4200,
+    "comments": 300,
+    "shares": 85,
+    "postUrl": "https://linkedin.com/posts/7",
+    "timestamp": "2026-05-04T08:00:00Z"
+  },
+  {
+    "text": "Your conversion rate is the only metric that actually matters.",
+    "likes": 2100,
+    "comments": 110,
+    "shares": 22,
+    "postUrl": "https://linkedin.com/posts/8",
+    "timestamp": "2026-05-04T10:00:00Z"
+  },
+
+  {
+    "text": "We just launched our new ecommerce platform. Check it out!",
+    "likes": 12,
+    "comments": 2,
+    "shares": 0,
+    "postUrl": "https://linkedin.com/posts/9",
+    "timestamp": "2026-05-04T11:00:00Z"
+  },
+
+  {
+    "text": "We are hiring a Growth Manager. Apply now!",
+    "likes": 45,
+    "comments": 5,
+    "shares": 1,
+    "postUrl": "https://linkedin.com/posts/10",
+    "timestamp": "2026-05-03T13:00:00Z"
+  },
+
+  {
+    "text": "Ecommerce is growing fast in 2023.",
+    "likes": 5000,
+    "comments": 200,
+    "shares": 100,
+    "postUrl": "https://linkedin.com/posts/11",
+    "timestamp": "2025-01-01T10:00:00Z"
+  },
+
+  {
+    "text": "Top 5 tips for staying productive while working remotely.",
+    "likes": 3000,
+    "comments": 100,
+    "shares": 20,
+    "postUrl": "https://linkedin.com/posts/12",
+    "timestamp": "2026-05-04T12:00:00Z"
+  },
+
+  {
+    "text": "Great insights!",
+    "likes": 800,
+    "comments": 20,
+    "shares": 2,
+    "postUrl": "https://linkedin.com/posts/13",
+    "timestamp": "2026-05-04T14:00:00Z"
+  },
+
+  
+  {
+    "text": "ईकॉमर्स में सफलता के लिए सही रणनीति ज़रूरी है",
+    "likes": 2500,
+    "comments": 150,
+    "shares": 30,
+    "postUrl": "https://linkedin.com/posts/14",
+    "timestamp": "2026-05-04T15:00:00Z"
   }
 ]
