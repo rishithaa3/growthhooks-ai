@@ -32,9 +32,9 @@ router.post('/send-email', async (req, res) => {
       }
     });
 
-    console.log("[DEBUG] Verifying SMTP connection...");
-    await transporter.verify();
-    console.log("✅ SMTP connection successful");
+    // console.log("[DEBUG] Verifying SMTP connection...");
+    // await transporter.verify();
+    // console.log("✅ SMTP connection successful");
 
     // ✅ Build HTML properly
     let htmlContent = `
